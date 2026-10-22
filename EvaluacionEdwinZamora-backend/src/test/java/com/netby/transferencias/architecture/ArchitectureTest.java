@@ -75,13 +75,13 @@ class ArchitectureTest {
         verificar(noClasses().that().resideInAPackage("..domain..").should().dependOnClassesThat()
                 .resideInAnyPackage(FRAMEWORKS));
         verificar(noClasses().that().resideInAPackage("..domain..").should().dependOnClassesThat()
-                .resideInAnyPackage("..application..", "..adapter..", "..bootstrap..", "org.slf4j..", "java.util.logging.."));
+                .resideInAnyPackage("..application..", "..infrastructure..", "org.slf4j..", "java.util.logging.."));
     }
 
     @Test
-    void application_no_depende_de_adapters_ni_bootstrap_y_solo_usa_cdi_y_transaccion_permitidos() {
+    void application_no_depende_de_infrastructure_y_solo_usa_cdi_y_transaccion_permitidos() {
         verificar(noClasses().that().resideInAPackage("..application..").should().dependOnClassesThat()
-                .resideInAnyPackage("..adapter..", "..bootstrap.."));
+                .resideInAnyPackage("..infrastructure.."));
         DescribedPredicate<JavaClass> permitido = resideInAnyPackage("..domain..", "..application..", "java..")
                 .or(equivalentTo(ApplicationScoped.class))
                 .or(equivalentTo(Inject.class))
@@ -99,14 +99,14 @@ class ArchitectureTest {
 
     @Test
     void adapters_de_entrada_y_salida_no_se_referencian_entre_si() {
-        verificar(slices().matching("..adapter.(*)..").should().notDependOnEachOther());
-        verificar(noClasses().that().resideInAPackage("..adapter..").should().dependOnClassesThat()
-                .resideInAPackage("..bootstrap.."));
+        verificar(slices().matching("..infrastructure.adapter.(*)..").should().notDependOnEachOther());
+        verificar(noClasses().that().resideInAPackage("..infrastructure.adapter..").should().dependOnClassesThat()
+                .resideInAPackage("..infrastructure.config.."));
     }
 
     @Test
     void adapters_de_entrada_dependen_de_puertos_no_de_la_implementacion() {
-        verificar(noClasses().that().resideInAPackage("..adapter..").should().dependOnClassesThat()
+        verificar(noClasses().that().resideInAPackage("..infrastructure.adapter..").should().dependOnClassesThat()
                 .resideInAPackage("..application.service.."));
     }
 
@@ -117,24 +117,52 @@ class ArchitectureTest {
         verificar(slices().matching(RAIZ + ".application.(*)..").should().beFreeOfCycles());
     }
 
+    // --- Estructura raíz ------------------------------------------------------------------------------------
+
+    @Test
+    void las_unicas_raices_bajo_el_paquete_base_son_domain_application_e_infrastructure() {
+        java.util.Set<String> raices = new java.util.TreeSet<>();
+        for (JavaClass c : clases) {
+            String resto = c.getPackageName().substring(Math.min(c.getPackageName().length(), RAIZ.length() + 1));
+            raices.add(resto.isEmpty() ? "(raiz)" : resto.split("\\.")[0]);
+        }
+        assertThat(raices).containsExactlyInAnyOrder("domain", "application", "infrastructure");
+        verificar(noClasses().should().resideInAnyPackage(RAIZ + ".adapter..", RAIZ + ".bootstrap.."));
+    }
+
+    @Test
+    void infrastructure_config_solo_contiene_configuracion_de_beans() {
+        verificar(classes().that().resideInAPackage("..infrastructure.config..")
+                .should().haveSimpleNameEndingWith("Beans")
+                .andShould().beAnnotatedWith(ApplicationScoped.class));
+        verificar(noClasses().that().resideInAPackage("..infrastructure.config..").should().dependOnClassesThat()
+                .resideInAnyPackage("..infrastructure.adapter.."));
+    }
+
+    @Test
+    void application_y_domain_no_dependen_de_infrastructure() {
+        verificar(noClasses().that().resideInAnyPackage("..domain..", "..application..").should()
+                .dependOnClassesThat().resideInAPackage("..infrastructure.."));
+    }
+
     // --- Ubicación de anotaciones ---------------------------------------------------------------------------
 
     @Test
-    void entity_solo_en_adapter_out_persistence_entity() {
-        verificar(classes().that().areAnnotatedWith(Entity.class).should().resideInAPackage("..adapter.out.persistence.entity.."));
-        verificar(classes().that().resideInAPackage("..adapter.out.persistence.entity..")
+    void entity_solo_en_infrastructure_adapter_out_persistence_entity() {
+        verificar(classes().that().areAnnotatedWith(Entity.class).should().resideInAPackage("..infrastructure.adapter.out.persistence.entity.."));
+        verificar(classes().that().resideInAPackage("..infrastructure.adapter.out.persistence.entity..")
                 .should().beAnnotatedWith(Entity.class));
     }
 
     @Test
-    void path_solo_en_adapter_in_rest() {
-        verificar(classes().that().areAnnotatedWith(Path.class).should().resideInAPackage("..adapter.in.rest.."));
+    void path_solo_en_infrastructure_adapter_in_rest() {
+        verificar(classes().that().areAnnotatedWith(Path.class).should().resideInAPackage("..infrastructure.adapter.in.rest.."));
     }
 
     @Test
-    void transactional_solo_en_metodos_de_application_service_o_adapter_out() {
+    void transactional_solo_en_metodos_de_application_service_o_infrastructure_adapter_out() {
         verificar(methods().that().areAnnotatedWith(Transactional.class).should().beDeclaredInClassesThat()
-                .resideInAnyPackage("..application.service..", "..adapter.out.."));
+                .resideInAnyPackage("..application.service..", "..infrastructure.adapter.out.."));
         verificar(noClasses().should().beAnnotatedWith(Transactional.class));
     }
 
@@ -159,7 +187,7 @@ class ArchitectureTest {
     @Test
     void los_componentes_cdi_con_constructor_unico_lo_marcan_con_inject() {
         verificar(classes().that().areAnnotatedWith(ApplicationScoped.class).or().areAnnotatedWith(Path.class)
-                .and().resideInAnyPackage("..application.service..", "..adapter..")
+                .and().resideInAnyPackage("..application.service..", "..infrastructure..")
                 .should(new ArchCondition<JavaClass>("tener su constructor público anotado con @Inject") {
                     @Override
                     public void check(JavaClass clase, ConditionEvents eventos) {
@@ -242,20 +270,20 @@ class ArchitectureTest {
 
     @Test
     void los_dto_rest_solo_usan_not_null_y_not_blank() {
-        verificar(noClasses().that().resideInAPackage("..adapter.in.rest.dto..").should().dependOnClassesThat(
+        verificar(noClasses().that().resideInAPackage("..infrastructure.adapter.in.rest.dto..").should().dependOnClassesThat(
                 resideInAPackage("jakarta.validation.constraints..")
                         .and(not(belongToAnyOf(NotNull.class, NotBlank.class)))));
     }
 
     @Test
     void las_entidades_jpa_no_declaran_reglas_con_check() {
-        verificar(noClasses().that().resideInAPackage("..adapter.out.persistence.entity..").should()
+        verificar(noClasses().that().resideInAPackage("..infrastructure.adapter.out.persistence.entity..").should()
                 .dependOnClassesThat().resideInAnyPackage("org.hibernate.annotations..", "jakarta.validation.."));
     }
 
     @Test
-    void solo_el_exception_mapper_conoce_los_errores_de_dominio_en_adapter_in() {
-        verificar(noClasses().that().resideInAPackage("..adapter.in..").and().doNotHaveSimpleName("GlobalExceptionMapper")
+    void solo_el_exception_mapper_conoce_los_errores_de_dominio_en_infrastructure_adapter_in() {
+        verificar(noClasses().that().resideInAPackage("..infrastructure.adapter.in..").and().doNotHaveSimpleName("GlobalExceptionMapper")
                 .should().dependOnClassesThat().resideInAPackage("..domain.error.."));
     }
 
