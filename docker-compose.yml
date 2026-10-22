@@ -2,7 +2,9 @@ name: evaluacion-edwin-zamora
 
 services:
   mysql:
-    image: mysql:8.0
+    build:
+      context: ./EvaluacionEdwinZamora-database
+    image: evaluacion-edwin-zamora-mysql:1.0.0
     container_name: evaluacion-edwin-zamora-mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-transferencias}
@@ -10,7 +12,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-transferencias}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       TZ: UTC
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "127.0.0.1:${MYSQL_HOST_PORT:-3307}:3306"
     volumes:
@@ -26,6 +27,7 @@ services:
   backend:
     build:
       context: ./EvaluacionEdwinZamora-backend
+    image: evaluacion-edwin-zamora-backend:1.0.0
     container_name: evaluacion-edwin-zamora-backend
     environment:
       DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-transferencias}?useSSL=false&allowPublicKeyRetrieval=true
@@ -49,6 +51,7 @@ services:
   frontend:
     build:
       context: ./EvaluacionEdwinZamora-frontend
+    image: evaluacion-edwin-zamora-frontend:1.0.0
     container_name: evaluacion-edwin-zamora-frontend
     ports:
       - "${FRONTEND_HOST_PORT:-4200}:8080"
