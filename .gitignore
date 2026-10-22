@@ -17,3 +17,6 @@ dist/
 # Logs y temporales
 *.log
 *.tmp
+
+# OpenAPI: se versiona solo el YAML (el JSON se regenera en cada build)
+EvaluacionEdwinZamora-backend/src/main/resources/openapi/openapi.json

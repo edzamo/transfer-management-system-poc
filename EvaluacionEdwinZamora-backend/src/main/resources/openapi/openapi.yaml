@@ -1,0 +1,652 @@
+---
+openapi: 3.1.0
+components:
+  schemas:
+    CuentaRequest:
+      description: Datos para registrar una cuenta bancaria
+      type: object
+      required:
+      - numero
+      - titular
+      - tipo
+      - saldoInicial
+      - estado
+      properties:
+        numero:
+          type: string
+          description: Número único de 10 dígitos
+          examples:
+          - "1234567890"
+          pattern: \S
+        titular:
+          type: string
+          description: Titular de la cuenta (máx. 150 caracteres)
+          examples:
+          - Ana Pérez
+          pattern: \S
+        tipo:
+          description: Tipo de cuenta
+          type: string
+          examples:
+          - AHORRO
+          $ref: "#/components/schemas/TipoCuenta"
+        saldoInicial:
+          type: number
+          description: "Saldo inicial (>= 0, máx. 2 decimales)"
+          examples:
+          - 1500.00
+        estado:
+          description: Estado de la cuenta
+          type: string
+          examples:
+          - ACTIVA
+          $ref: "#/components/schemas/EstadoCuenta"
+    CuentaResponse:
+      description: Cuenta bancaria
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+          - 1
+        numero:
+          type: string
+          examples:
+          - "1234567890"
+        titular:
+          type: string
+          examples:
+          - Ana Pérez
+        tipo:
+          type: string
+          examples:
+          - AHORRO
+          $ref: "#/components/schemas/TipoCuenta"
+        saldo:
+          type: number
+          examples:
+          - 1500.00
+        estado:
+          type: string
+          examples:
+          - ACTIVA
+          $ref: "#/components/schemas/EstadoCuenta"
+    Detalle:
+      type: object
+      properties:
+        field:
+          type: string
+          examples:
+          - monto
+        message:
+          type: string
+          examples:
+          - El monto debe ser mayor a cero
+    ErrorResponse:
+      description: Error de la API
+      type: object
+      properties:
+        timestamp:
+          type: string
+          examples:
+          - 2026-10-22T15:00:00Z
+          $ref: "#/components/schemas/Instant"
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 422
+        code:
+          type: string
+          description: Código estable para el cliente
+          examples:
+          - SALDO_INSUFICIENTE
+        message:
+          type: string
+          examples:
+          - Saldo insuficiente en la cuenta ******7890
+        path:
+          type: string
+          examples:
+          - /api/transferencias
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/Detalle"
+          description: Detalle por campo (errores de validación)
+        montoRestante:
+          type: number
+          description: "Solo en LIMITE_DIARIO_EXCEDIDO: monto aún disponible hoy"
+          examples:
+          - 500.00
+    EstadoCuenta:
+      type: string
+      enum:
+      - ACTIVA
+      - INACTIVA
+    EstadoTransferencia:
+      type: string
+      enum:
+      - COMPLETADA
+      - RECHAZADA
+      - EN_REVISION
+    Instant:
+      type: string
+      format: date-time
+    PaginaResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items: {}
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+    ResumenCuentaResponse:
+      description: Resumen de la cuenta para el día calendario actual
+      type: object
+      properties:
+        cuentaId:
+          type: integer
+          format: int64
+          examples:
+          - 1
+        saldoActual:
+          type: number
+          examples:
+          - 1500.00
+        totalTransferidoHoy:
+          type: number
+          description: Suma de transferencias COMPLETADA y EN_REVISION de hoy
+          examples:
+          - 600.00
+        cantidadTransferenciasHoy:
+          type: integer
+          format: int64
+          description: Cantidad de transferencias COMPLETADA y EN_REVISION de hoy
+          examples:
+          - 3
+        cantidadSospechosasHoy:
+          type: integer
+          format: int64
+          description: Cantidad de transferencias EN_REVISION de hoy
+          examples:
+          - 1
+    TipoCuenta:
+      type: string
+      enum:
+      - AHORRO
+      - CORRIENTE
+    TransferenciaRequest:
+      description: Datos para ejecutar una transferencia
+      type: object
+      required:
+      - cuentaOrigen
+      - cuentaDestino
+      - monto
+      properties:
+        cuentaOrigen:
+          type: string
+          description: Número de la cuenta origen
+          examples:
+          - "1234567890"
+          pattern: \S
+        cuentaDestino:
+          type: string
+          description: Número de la cuenta destino
+          examples:
+          - "0987654321"
+          pattern: \S
+        monto:
+          type: number
+          description: Monto > 0 con máximo 2 decimales
+          examples:
+          - 250.75
+    TransferenciaResponse:
+      description: "Transferencia registrada (COMPLETADA, EN_REVISION o RECHAZADA)"
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+          - 10
+        cuentaOrigen:
+          type: string
+          examples:
+          - "1234567890"
+        cuentaDestino:
+          type: string
+          examples:
+          - "0987654321"
+        monto:
+          type: number
+          examples:
+          - 250.75
+        estado:
+          type: string
+          examples:
+          - COMPLETADA
+          $ref: "#/components/schemas/EstadoTransferencia"
+        motivo:
+          type:
+          - string
+          - "null"
+          description: Motivo del rechazo; nulo si no fue rechazada
+        fecha:
+          description: Instante UTC (ISO-8601)
+          type: string
+          examples:
+          - 2026-10-22T15:00:00Z
+          $ref: "#/components/schemas/Instant"
+tags:
+- name: Cuentas
+  description: "Registro, listado y resumen de cuentas bancarias"
+- name: Transferencias
+  description: Ejecución e historial de transferencias entre cuentas
+paths:
+  /api/cuentas:
+    get:
+      summary: Listar cuentas
+      description: Lista paginada de cuentas ordenadas por id.
+      tags:
+      - Cuentas
+      parameters:
+      - description: Página (base 0)
+        example: 0
+        in: query
+        name: page
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - description: Tamaño de página (1 a 200)
+        example: 20
+        in: query
+        name: size
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        "200":
+          description: Página de cuentas
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    content:
+                    - id: 1
+                      numero: "1234567890"
+                      titular: Ana Pérez
+                      tipo: AHORRO
+                      saldo: 1500.0
+                      estado: ACTIVA
+                    page: 0
+                    size: 20
+                    totalElements: 1
+                    totalPages: 1
+              schema:
+                $ref: "#/components/schemas/PaginaResponse"
+        "400":
+          description: Paginación inválida
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Registrar una cuenta
+      description: "Crea una cuenta con número único de 10 dígitos, titular, tipo,\
+        \ saldo inicial (>= 0) y estado."
+      tags:
+      - Cuentas
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Cuenta de ahorro:
+                value:
+                  numero: "1234567890"
+                  titular: Ana Pérez
+                  tipo: AHORRO
+                  saldoInicial: 1500.0
+                  estado: ACTIVA
+            schema:
+              $ref: "#/components/schemas/CuentaRequest"
+        required: true
+      responses:
+        "201":
+          description: Cuenta creada
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    id: 1
+                    numero: "1234567890"
+                    titular: Ana Pérez
+                    tipo: AHORRO
+                    saldo: 1500.0
+                    estado: ACTIVA
+              schema:
+                $ref: "#/components/schemas/CuentaResponse"
+        "400":
+          description: "Datos inválidos (número, titular, saldo negativo, JSON)"
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 400
+                    code: VALIDACION
+                    message: El campo saldoInicial no puede ser negativo
+                    path: /api/cuentas
+                    details:
+                    - field: saldoInicial
+                      message: El campo saldoInicial no puede ser negativo
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Ya existe una cuenta con ese número
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 409
+                    code: CUENTA_DUPLICADA
+                    message: Ya existe una cuenta con el número ******7890
+                    path: /api/cuentas
+                    details: []
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/cuentas/{id}/resumen:
+    get:
+      summary: Resumen de una cuenta
+      description: "Saldo actual y, para el día calendario en curso, total transferido,\
+        \ cantidad de transferencias (COMPLETADA + EN_REVISION) y cantidad de sospechosas\
+        \ (EN_REVISION)."
+      tags:
+      - Cuentas
+      parameters:
+      - description: Identificador de la cuenta
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Resumen de la cuenta
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    cuentaId: 1
+                    saldoActual: 1500.0
+                    totalTransferidoHoy: 600.0
+                    cantidadTransferenciasHoy: 3
+                    cantidadSospechosasHoy: 1
+              schema:
+                $ref: "#/components/schemas/ResumenCuentaResponse"
+        "400":
+          description: Identificador inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: La cuenta no existe
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 404
+                    code: CUENTA_NO_ENCONTRADA
+                    message: No existe la cuenta con id 99
+                    path: /api/cuentas/99/resumen
+                    details: []
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/transferencias:
+    post:
+      summary: Realizar una transferencia
+      description: Mueve el monto entre dos cuentas de forma atómica. Si es sospechosa
+        (monto > 5000 o más de 5 transferencias del origen en la última hora) se registra
+        EN_REVISION y los saldos igualmente se actualizan. Los rechazos por regla
+        (422) quedan registrados como RECHAZADA.
+      tags:
+      - Transferencias
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Transferencia:
+                value:
+                  cuentaOrigen: "1234567890"
+                  cuentaDestino: "0987654321"
+                  monto: 250.75
+            schema:
+              $ref: "#/components/schemas/TransferenciaRequest"
+        required: true
+      responses:
+        "201":
+          description: Transferencia registrada (COMPLETADA o EN_REVISION)
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    id: 10
+                    cuentaOrigen: "1234567890"
+                    cuentaDestino: "0987654321"
+                    monto: 250.75
+                    estado: COMPLETADA
+                    motivo: null
+                    fecha: 2026-10-22T15:00:00Z
+              schema:
+                $ref: "#/components/schemas/TransferenciaResponse"
+        "400":
+          description: "Datos inválidos (monto <= 0, más de 2 decimales, origen =\
+            \ destino)"
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 400
+                    code: VALIDACION
+                    message: El monto debe ser mayor a cero
+                    path: /api/transferencias
+                    details:
+                    - field: monto
+                      message: El monto debe ser mayor a cero
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: La cuenta origen o destino no existe
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 404
+                    code: CUENTA_NO_ENCONTRADA
+                    message: No existe la cuenta ******4321
+                    path: /api/transferencias
+                    details: []
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: La cuenta está siendo modificada por otra operación; reintentar
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 409
+                    code: CUENTA_BLOQUEADA
+                    message: La cuenta ******7890 está siendo modificada por otra
+                      operación; reintente
+                    path: /api/transferencias
+                    details: []
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: "Regla de negocio: CUENTA_INACTIVA, SALDO_INSUFICIENTE o LIMITE_DIARIO_EXCEDIDO\
+            \ (con montoRestante)"
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    timestamp: 2026-10-22T15:00:00Z
+                    status: 422
+                    code: LIMITE_DIARIO_EXCEDIDO
+                    message: "Límite diario excedido. Monto restante disponible: 500.00"
+                    path: /api/transferencias
+                    details: []
+                    montoRestante: 500.0
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: Historial de transferencias
+      description: "Consulta paginada con filtros opcionales, ordenada por fecha descendente."
+      tags:
+      - Transferencias
+      parameters:
+      - description: Número de cuenta origen
+        example: "1234567890"
+        in: query
+        name: origen
+        schema:
+          type: string
+      - description: Número de cuenta destino
+        example: "0987654321"
+        in: query
+        name: destino
+        schema:
+          type: string
+      - description: "Fecha inicial inclusive (ISO-8601, UTC)"
+        example: 2026-10-01T00:00:00Z
+        in: query
+        name: desde
+        schema:
+          $ref: "#/components/schemas/Instant"
+      - description: "Fecha final inclusive (ISO-8601, UTC)"
+        example: 2026-10-31T23:59:59Z
+        in: query
+        name: hasta
+        schema:
+          $ref: "#/components/schemas/Instant"
+      - description: "COMPLETADA, RECHAZADA o EN_REVISION"
+        example: COMPLETADA
+        in: query
+        name: estado
+        schema:
+          $ref: "#/components/schemas/EstadoTransferencia"
+      - description: Página (base 0)
+        example: 0
+        in: query
+        name: page
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - description: Tamaño de página (1 a 200)
+        example: 20
+        in: query
+        name: size
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        "200":
+          description: Página de transferencias
+          content:
+            application/json:
+              examples:
+                Ejemplo:
+                  value:
+                    content:
+                    - id: 10
+                      cuentaOrigen: "1234567890"
+                      cuentaDestino: "0987654321"
+                      monto: 250.75
+                      estado: COMPLETADA
+                      motivo: null
+                      fecha: 2026-10-22T15:00:00Z
+                    page: 0
+                    size: 20
+                    totalElements: 1
+                    totalPages: 1
+              schema:
+                $ref: "#/components/schemas/PaginaResponse"
+        "400":
+          description: Filtros o paginación inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+info:
+  title: Transferencias Interbancarias API
+  version: 1.0.0
+  description: "Gestión de cuentas, transferencias, detección de operaciones sospechosas\
+    \ e historial."
+servers:
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value
