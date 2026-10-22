@@ -13,3 +13,7 @@ dist/
 
 # Entorno
 .env
+
+# Logs y temporales
+*.log
+*.tmp
