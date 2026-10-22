@@ -7,8 +7,8 @@ Autor: **Edwin Zamora**.
 |---|---|---|
 | EvaluacionEdwinZamora-backend | [`EvaluacionEdwinZamora-backend/`](EvaluacionEdwinZamora-backend) | Java 21, Quarkus 3.39 (Quarkus REST, Hibernate ORM Panache), MapStruct, Flyway, OpenAPI |
 | EvaluacionEdwinZamora-frontend | [`EvaluacionEdwinZamora-frontend/`](EvaluacionEdwinZamora-frontend) | Angular 21, Angular Material, Vitest |
-| Base de datos | — | MySQL 8.0 (migraciones con Flyway) |
-| Infraestructura | [`docker-compose.yml`](docker-compose.yml) | Docker Compose (mysql + backend + frontend/nginx) |
+| EvaluacionEdwinZamora-database | [`EvaluacionEdwinZamora-database/`](EvaluacionEdwinZamora-database) | MySQL 8.0 con su propio Dockerfile (el esquema lo crea Flyway) |
+| Infraestructura | [`docker-compose.yml`](docker-compose.yml) | Docker Compose: construye y levanta las tres imágenes (mysql, backend, frontend/nginx), cada una con su Dockerfile |
 
 ## 1. Arranque rápido (Docker, un solo comando)
 
