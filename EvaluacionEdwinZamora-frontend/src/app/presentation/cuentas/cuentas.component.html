@@ -1,4 +1,4 @@
-<section class="cuentas">
+<section class="cuentas tarjeta">
   <h1>Cuentas</h1>
 
   @if (cargando()) {
@@ -35,12 +35,12 @@
               Saldo {{ orden() === 'asc' ? '▲' : orden() === 'desc' ? '▼' : '' }}
             </button>
           </th>
-          <td mat-cell *matCellDef="let cuenta">{{ cuenta.saldo | currency: 'USD' }}</td>
+          <td mat-cell *matCellDef="let cuenta" class="monto">{{ cuenta.saldo | currency: 'USD' }}</td>
         </ng-container>
         <ng-container matColumnDef="estado">
           <th mat-header-cell *matHeaderCellDef>Estado</th>
           <td mat-cell *matCellDef="let cuenta">
-            <span [class.inactiva]="cuenta.estado === 'INACTIVA'">{{ cuenta.estado }}</span>
+            <span class="estado" [class.inactiva]="cuenta.estado === 'INACTIVA'">{{ cuenta.estado }}</span>
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="columnas"></tr>

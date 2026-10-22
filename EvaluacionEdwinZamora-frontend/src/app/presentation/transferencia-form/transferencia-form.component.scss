@@ -1,13 +1,29 @@
 :host {
   display: block;
-  padding: 1rem;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 form {
   display: flex;
   flex-direction: column;
-  max-width: 420px;
   gap: 0.25rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button[type='submit'] {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  padding: 0 2rem;
+  background: var(--verde);
+  color: #ffffff;
+}
+
+button[type='submit']:disabled {
+  opacity: 0.6;
 }
 
 .error-campo {
@@ -16,14 +32,26 @@ form {
   font-size: 0.85rem;
 }
 
+[data-testid='resultado'],
+[data-testid='error-cuentas'] {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border-left: 5px solid currentColor;
+}
+
 [data-tipo='exito'] {
-  color: #1b5e20;
+  color: var(--exito);
+  background: var(--exito-fondo);
 }
 
 [data-tipo='advertencia'] {
-  color: #8a5a00;
+  color: var(--aviso);
+  background: var(--aviso-fondo);
 }
 
-[data-tipo='error'] {
-  color: var(--mat-sys-error);
+[data-tipo='error'],
+[data-testid='error-cuentas'] {
+  color: var(--error);
+  background: var(--error-fondo);
 }

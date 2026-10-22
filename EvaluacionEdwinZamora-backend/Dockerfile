@@ -4,7 +4,9 @@ WORKDIR /build
 COPY pom.xml .
 RUN mvn -B -q dependency:go-offline
 COPY src ./src
-RUN mvn -B -q package -DskipTests
+# Las migraciones de Flyway se fijan en build. Por defecto solo el esquema; compose añade db/seed (datos de demo).
+ARG FLYWAY_LOCATIONS=classpath:db/migration
+RUN mvn -B -q package -DskipTests -Dquarkus.flyway.locations=${FLYWAY_LOCATIONS}
 
 # Etapa 2: runtime mínimo
 FROM eclipse-temurin:21-jre-alpine

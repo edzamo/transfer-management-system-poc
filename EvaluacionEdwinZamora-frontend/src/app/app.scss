@@ -1,20 +1,41 @@
+.barra {
+  background: var(--verde);
+  color: #ffffff;
+  border-bottom: 4px solid var(--lima);
+  padding: 0 1.5rem;
+}
+
 .titulo {
-  margin-right: 2rem;
+  margin-right: 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 nav a {
-  color: inherit;
-  margin-right: 1rem;
+  color: #ffffff;
+  margin-right: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
   text-decoration: none;
-  opacity: 0.8;
+  opacity: 0.85;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+    opacity: 1;
+  }
 
   &.activo {
+    background: var(--lima);
+    color: var(--verde);
+    font-weight: 500;
     opacity: 1;
-    text-decoration: underline;
   }
 }
 
 main {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
 }
