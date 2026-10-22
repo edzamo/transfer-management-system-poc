@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  max-width: 420px;
+  gap: 0.25rem;
+}
+
+.error-campo {
+  color: var(--mat-sys-error);
+  margin: -0.5rem 0 0.5rem;
+  font-size: 0.85rem;
+}
+
+[data-tipo='exito'] {
+  color: #1b5e20;
+}
+
+[data-tipo='advertencia'] {
+  color: #8a5a00;
+}
+
+[data-tipo='error'] {
+  color: var(--mat-sys-error);
+}

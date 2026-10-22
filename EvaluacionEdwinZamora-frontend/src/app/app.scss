@@ -1,0 +1,20 @@
+.titulo {
+  margin-right: 2rem;
+}
+
+nav a {
+  color: inherit;
+  margin-right: 1rem;
+  text-decoration: none;
+  opacity: 0.8;
+
+  &.activo {
+    opacity: 1;
+    text-decoration: underline;
+  }
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+}
