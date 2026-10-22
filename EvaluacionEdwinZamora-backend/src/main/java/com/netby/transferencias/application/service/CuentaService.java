@@ -1,8 +1,8 @@
 package com.netby.transferencias.application.service;
 
-import com.netby.transferencias.application.dto.Pagina;
-import com.netby.transferencias.application.dto.Paginacion;
-import com.netby.transferencias.application.dto.ResumenCuenta;
+import com.netby.transferencias.domain.shared.Pagina;
+import com.netby.transferencias.domain.shared.Paginacion;
+import com.netby.transferencias.application.in.ResumenCuenta;
 import com.netby.transferencias.application.in.ListarCuentas;
 import com.netby.transferencias.application.in.ObtenerResumenCuenta;
 import com.netby.transferencias.application.in.RegistrarCuenta;

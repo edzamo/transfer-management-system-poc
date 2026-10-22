@@ -3,7 +3,7 @@ package com.netby.transferencias.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.netby.transferencias.application.dto.FiltroTransferencias;
+import com.netby.transferencias.application.in.FiltroTransferencias;
 import com.netby.transferencias.application.fake.InMemoryCuentaRepository;
 import com.netby.transferencias.application.fake.InMemoryTransferenciaRepository;
 import com.netby.transferencias.application.in.ConsultarHistorialTransferencias;

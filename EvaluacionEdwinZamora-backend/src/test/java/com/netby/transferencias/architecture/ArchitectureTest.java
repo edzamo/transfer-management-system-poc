@@ -229,6 +229,12 @@ class ArchitectureTest {
     }
 
     @Test
+    void no_existe_ningun_paquete_application_dto() {
+        assertThat(clases.stream().map(JavaClass::getPackageName).filter(p -> p.contains(".application.dto")))
+                .isEmpty();
+    }
+
+    @Test
     void puertos_no_usan_nombres_tecnicos() {
         verificar(noClasses().that().resideInAnyPackage("..application.in..", "..application.out..")
                 .should().haveNameMatching(".*(Jpa|Panache|Rest|Http|Sql).*"));
@@ -236,7 +242,7 @@ class ArchitectureTest {
 
     @Test
     void puertos_de_salida_no_exponen_tipos_de_framework() {
-        verificar(noClasses().that().resideInAnyPackage("..application.in..", "..application.out..", "..application.dto..")
+        verificar(noClasses().that().resideInAnyPackage("..application.in..", "..application.out..", "..domain.shared..")
                 .should().dependOnClassesThat().resideInAnyPackage(FRAMEWORKS));
     }
 

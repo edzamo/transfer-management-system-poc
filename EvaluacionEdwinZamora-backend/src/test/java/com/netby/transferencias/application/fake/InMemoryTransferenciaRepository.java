@@ -1,7 +1,7 @@
 package com.netby.transferencias.application.fake;
 
-import com.netby.transferencias.application.dto.FiltroTransferencias;
-import com.netby.transferencias.application.dto.Pagina;
+import com.netby.transferencias.application.in.FiltroTransferencias;
+import com.netby.transferencias.domain.shared.Pagina;
 import com.netby.transferencias.application.out.TransferenciaRepository;
 import com.netby.transferencias.domain.cuenta.NumeroCuenta;
 import com.netby.transferencias.domain.dinero.Dinero;

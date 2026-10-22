@@ -1,8 +1,8 @@
 package com.netby.transferencias.application.service;
 
-import com.netby.transferencias.application.dto.FiltroTransferencias;
-import com.netby.transferencias.application.dto.Pagina;
-import com.netby.transferencias.application.dto.Paginacion;
+import com.netby.transferencias.application.in.FiltroTransferencias;
+import com.netby.transferencias.domain.shared.Pagina;
+import com.netby.transferencias.domain.shared.Paginacion;
 import com.netby.transferencias.application.in.ConsultarHistorialTransferencias;
 import com.netby.transferencias.application.in.RealizarTransferencia;
 import com.netby.transferencias.application.out.CuentaRepository;

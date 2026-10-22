@@ -2,7 +2,7 @@ package com.netby.transferencias.contract;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.netby.transferencias.application.dto.FiltroTransferencias;
+import com.netby.transferencias.application.in.FiltroTransferencias;
 import com.netby.transferencias.application.out.TransferenciaRepository;
 import com.netby.transferencias.domain.cuenta.NumeroCuenta;
 import com.netby.transferencias.domain.dinero.Dinero;
