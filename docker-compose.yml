@@ -27,6 +27,8 @@ services:
   backend:
     build:
       context: ./EvaluacionEdwinZamora-backend
+      args:
+        FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/seed
     image: evaluacion-edwin-zamora-backend:1.0.0
     container_name: evaluacion-edwin-zamora-backend
     environment:
