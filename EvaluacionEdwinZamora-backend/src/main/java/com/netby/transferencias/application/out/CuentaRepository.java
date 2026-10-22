@@ -1,6 +1,6 @@
 package com.netby.transferencias.application.out;
 
-import com.netby.transferencias.application.dto.Pagina;
+import com.netby.transferencias.domain.shared.Pagina;
 import com.netby.transferencias.domain.cuenta.Cuenta;
 import com.netby.transferencias.domain.cuenta.NumeroCuenta;
 import java.util.Optional;

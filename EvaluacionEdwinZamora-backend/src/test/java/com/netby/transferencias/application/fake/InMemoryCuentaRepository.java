@@ -1,6 +1,6 @@
 package com.netby.transferencias.application.fake;
 
-import com.netby.transferencias.application.dto.Pagina;
+import com.netby.transferencias.domain.shared.Pagina;
 import com.netby.transferencias.application.out.CuentaRepository;
 import com.netby.transferencias.domain.cuenta.Cuenta;
 import com.netby.transferencias.domain.cuenta.NumeroCuenta;

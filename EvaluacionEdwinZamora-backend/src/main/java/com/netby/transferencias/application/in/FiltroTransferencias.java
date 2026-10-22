@@ -1,4 +1,4 @@
-package com.netby.transferencias.application.dto;
+package com.netby.transferencias.application.in;
 
 import com.netby.transferencias.domain.cuenta.NumeroCuenta;
 import com.netby.transferencias.domain.transferencia.EstadoTransferencia;

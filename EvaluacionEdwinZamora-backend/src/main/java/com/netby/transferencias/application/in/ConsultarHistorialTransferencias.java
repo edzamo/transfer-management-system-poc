@@ -1,6 +1,6 @@
 package com.netby.transferencias.application.in;
 
-import com.netby.transferencias.application.dto.Pagina;
+import com.netby.transferencias.domain.shared.Pagina;
 import com.netby.transferencias.domain.transferencia.EstadoTransferencia;
 import com.netby.transferencias.domain.transferencia.Transferencia;
 import java.time.Instant;

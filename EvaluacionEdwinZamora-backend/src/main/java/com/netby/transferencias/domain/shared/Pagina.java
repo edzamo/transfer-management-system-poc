@@ -1,4 +1,4 @@
-package com.netby.transferencias.application.dto;
+package com.netby.transferencias.domain.shared;
 
 import java.util.List;
 import java.util.function.Function;

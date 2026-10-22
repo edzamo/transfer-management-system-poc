@@ -6,8 +6,8 @@ import com.netby.transferencias.infrastructure.adapter.in.rest.dto.PaginaRespons
 import com.netby.transferencias.infrastructure.adapter.in.rest.dto.ResumenCuentaResponse;
 import com.netby.transferencias.infrastructure.adapter.in.rest.dto.TransferenciaRequest;
 import com.netby.transferencias.infrastructure.adapter.in.rest.dto.TransferenciaResponse;
-import com.netby.transferencias.application.dto.Pagina;
-import com.netby.transferencias.application.dto.ResumenCuenta;
+import com.netby.transferencias.domain.shared.Pagina;
+import com.netby.transferencias.application.in.ResumenCuenta;
 import com.netby.transferencias.application.in.RealizarTransferencia;
 import com.netby.transferencias.application.in.RegistrarCuenta;
 import com.netby.transferencias.domain.cuenta.Cuenta;
