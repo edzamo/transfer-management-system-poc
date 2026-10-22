@@ -23,7 +23,8 @@ docker compose up --build
 | Frontend (dashboard) | http://localhost:4200 |
 | API REST | http://localhost:8080/api |
 | **Swagger UI** | **http://localhost:8080/swagger-ui** |
-| OpenAPI (JSON/YAML) | http://localhost:8080/q/openapi |
+| OpenAPI (en vivo) | http://localhost:8080/q/openapi |
+| **Contrato OpenAPI (YAML versionado)** | [`EvaluacionEdwinZamora-backend/src/main/resources/openapi/openapi.yaml`](EvaluacionEdwinZamora-backend/src/main/resources/openapi/openapi.yaml) |
 | Health | http://localhost:8080/q/health |
 | MySQL (solo loopback del host) | `127.0.0.1:3307` |
 
@@ -74,6 +75,8 @@ npm run build
 ```
 
 ## 5. API
+
+El contrato completo (endpoints, parámetros, códigos de respuesta, esquemas y ejemplos) está en [`openapi.yaml`](EvaluacionEdwinZamora-backend/src/main/resources/openapi/openapi.yaml). Se regenera automáticamente en cada `./mvnw package` a partir de las anotaciones del código, por lo que no se desfasa del servicio.
 
 | Método | Ruta | Descripción | Códigos |
 |---|---|---|---|
