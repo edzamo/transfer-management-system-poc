@@ -124,11 +124,12 @@ Decisiones de interpretación:
 **Backend — hexagonal (puertos y adaptadores) con DDD.** Paquetes bajo `com.netby.transferencias`:
 
 ```
-domain/       Cuenta, Transferencia, VOs (NumeroCuenta, Titular, Dinero), servicios de dominio, errores
-application/  puertos de entrada (casos de uso) y salida (repositorios), CuentaService, TransferenciaService
-adapter/in    REST: Resources, DTOs, mapper, GlobalExceptionMapper
-adapter/out   Persistencia: entidades JPA, Panache, adaptadores
-bootstrap/    Clock y servicios de dominio
+domain/          Cuenta, Transferencia, VOs (NumeroCuenta, Titular, Dinero), servicios de dominio, errores
+application/     puertos de entrada (casos de uso) y salida (repositorios), CuentaService, TransferenciaService
+infrastructure/
+  adapter/in/    REST: Resources, DTOs, mapper, GlobalExceptionMapper
+  adapter/out/   Persistencia: entidades JPA, Panache, adaptadores
+  config/        Cableado de dependencias (Clock y servicios de dominio)
 ```
 
 El dominio es Java puro (sin frameworks); lo verifican reglas **ArchUnit** que forman parte de la suite de tests.
@@ -139,8 +140,8 @@ El dominio es Java puro (sin frameworks); lo verifican reglas **ArchUnit** que f
 
 | Criterio | Archivo(s) |
 |---|---|
-| CA-01 Cuentas | `adapter/in/rest/CuentaResource.java`, `adapter/out/persistence/entity/CuentaEntity.java` (entidad JPA), `domain/cuenta/Cuenta.java` (dominio), `application/out/CuentaRepository.java` |
-| CA-02 Transferencias | `adapter/in/rest/TransferenciaResource.java`, `application/service/TransferenciaService.java`, `domain/transferencia/Transferencia.java` |
+| CA-01 Cuentas | `infrastructure/adapter/in/rest/CuentaResource.java`, `infrastructure/adapter/out/persistence/entity/CuentaEntity.java` (entidad JPA), `domain/cuenta/Cuenta.java` (dominio), `application/out/CuentaRepository.java` |
+| CA-02 Transferencias | `infrastructure/adapter/in/rest/TransferenciaResource.java`, `application/service/TransferenciaService.java`, `domain/transferencia/Transferencia.java` |
 | CA-03 Sospechosas | `domain/transferencia/DeteccionSospechosaService.java` |
 | CA-04 Límite diario | `domain/transferencia/LimiteDiarioService.java` |
 | CA-05 Historial y resumen | `TransferenciaResource` (`GET /api/transferencias`), `CuentaResource` (`GET /api/cuentas/{id}/resumen`) |
