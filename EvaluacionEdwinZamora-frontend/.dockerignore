@@ -1,0 +1,11 @@
+node_modules
+dist
+.angular
+out-tsc
+coverage
+npm-debug.log
+.git
+.gitignore
+Dockerfile
+.dockerignore
+README.md
