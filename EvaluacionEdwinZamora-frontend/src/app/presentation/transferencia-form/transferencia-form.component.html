@@ -1,0 +1,53 @@
+<h1>Nueva transferencia</h1>
+
+@if (errorCuentas(); as mensaje) {
+  <p role="alert" data-testid="error-cuentas">{{ mensaje }}</p>
+}
+
+<form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+  <mat-form-field>
+    <mat-label>Cuenta origen</mat-label>
+    <select matNativeControl formControlName="cuentaOrigen">
+      <option value=""></option>
+      @for (cuenta of cuentas(); track cuenta.id) {
+        <option [value]="cuenta.numero">{{ cuenta.numero }} - {{ cuenta.titular }}</option>
+      }
+    </select>
+  </mat-form-field>
+  @if (mensajeDe('cuentaOrigen'); as mensaje) {
+    <p class="error-campo">{{ mensaje }}</p>
+  }
+
+  <mat-form-field>
+    <mat-label>Cuenta destino</mat-label>
+    <select matNativeControl formControlName="cuentaDestino">
+      <option value=""></option>
+      @for (cuenta of cuentas(); track cuenta.id) {
+        <option [value]="cuenta.numero">{{ cuenta.numero }} - {{ cuenta.titular }}</option>
+      }
+    </select>
+  </mat-form-field>
+  @if (mensajeDe('cuentaDestino'); as mensaje) {
+    <p class="error-campo">{{ mensaje }}</p>
+  }
+
+  <mat-form-field>
+    <mat-label>Monto</mat-label>
+    <input matInput formControlName="monto" inputmode="decimal" />
+  </mat-form-field>
+  @if (mensajeDe('monto'); as mensaje) {
+    <p class="error-campo">{{ mensaje }}</p>
+  }
+
+  <button mat-flat-button type="submit" [disabled]="enviando()">Transferir</button>
+</form>
+
+@if (resultado(); as r) {
+  <p
+    data-testid="resultado"
+    [attr.data-tipo]="r.tipo"
+    [attr.role]="r.tipo === 'exito' ? 'status' : 'alert'"
+  >
+    {{ r.mensaje }}
+  </p>
+}
